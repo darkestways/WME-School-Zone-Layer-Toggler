@@ -2,7 +2,7 @@
 // @name         WME SZ Layer Toggler
 // @namespace    https://greasyfork.org/en/users/1558508-darkest-ways-waze
 // @description  Toggle the School Zone layer on/off in WME
-// @version      2026.03.06.01
+// @version      2026.03.06.02
 // @author       DarkestWays
 // @match        *://*.waze.com/*editor*
 // @exclude      *://*.waze.com/user/editor*
@@ -22,12 +22,18 @@ const SCRIPT_SHORTNAME = 'WME-SZLT';
 
 const WME_SZL_SELECTOR_ID = '#layer-switcher-item_permanent_hazard_school_zone';
 
-const DEF_NOTIF_TIMEOUT = 5000; // 5 seconds
-const DEF_NOTIF_RATE_LIMIT = 30000; // 1 notification per 30 seconds block, unless showNow is true
+const DEF_NOTIF_TIMEOUT = 2000; // 2 seconds
+const DEF_NOTIF_RATE_LIMIT = 20000; // 1 notification per 20 seconds block, unless showNow is true
 
 const logger = (message) => {
     console.log(`[${SCRIPT_SHORTNAME}]: ${message}`);
 };
+
+// Adapted from WME True Segment Length script
+async function waitAndUpdate(func) {
+    await new Promise(r => setTimeout(r, 175));
+    await func();
+}
 
 // Load Toastr for notifications
 function loadToastr() {
@@ -103,14 +109,21 @@ function init() {
 
     function setupShortcuts() {
         const shortcut = {
-            callback: () => {
+            callback: async () => {
                 logger("Shortcut activated: Toggling layer visibility");
                 const szLayerItem = document.querySelector(WME_SZL_SELECTOR_ID);
                 if (szLayerItem) {
                     szLayerItem.click();
+
+                    await waitAndUpdate(() => { // Wait for the UI to update after the click
+                        const isVisible = szLayerItem.shadowRoot.querySelector('input[type="checkbox"]').checked;
+                        const msg = `SZ Layer ${isVisible ? 'Visible' : 'Hidden'}`;
+                        showNotification(msg, {title: '', type: isVisible ? 'info' : 'warning'});
+                    });
+
                 } else {
                     logger("SZ Layer item not found in the DOM");
-                    showNotification("SZ Layer item not found", {type: 'error'});
+                    showNotification("SZ Layer checkbox not found", {type: 'error', showNow: true});
                 }
             },
             description: "Toggle SZ Layer Visibility",
