@@ -2,7 +2,7 @@
 // @name         WME SZ Layer Toggler
 // @namespace    https://greasyfork.org/en/users/1558508-darkest-ways-waze
 // @description  Toggle the School Zone layer on/off in WME
-// @version      2026.03.06.02
+// @version      2026.04.16.01
 // @author       DarkestWays
 // @match        *://*.waze.com/*editor*
 // @exclude      *://*.waze.com/user/editor*
@@ -20,6 +20,7 @@ const SCRIPT_VERSION = GM_info.script.version;
 const SCRIPT_ID = 'wme_sz_layer_toggler';
 const SCRIPT_SHORTNAME = 'WME-SZLT';
 
+const WME_PHL_GROUP_SELECTOR_ID = '#layer-switcher-group_permanent_hazards';
 const WME_SZL_SELECTOR_ID = '#layer-switcher-item_permanent_hazard_school_zone';
 
 const DEF_NOTIF_TIMEOUT = 2000; // 2 seconds
@@ -111,8 +112,17 @@ function init() {
         const shortcut = {
             callback: async () => {
                 logger("Shortcut activated: Toggling layer visibility");
+                const phLayerItem = document.querySelector(WME_PHL_GROUP_SELECTOR_ID);
                 const szLayerItem = document.querySelector(WME_SZL_SELECTOR_ID);
-                if (szLayerItem) {
+                if (phLayerItem && szLayerItem) {
+                    const isPHGroupVisible = phLayerItem.shadowRoot.querySelector('input[type="checkbox"]').checked;
+                    // If PH Group is not visible, exit early
+                    if (!isPHGroupVisible) {
+                        logger("PH Group is not visible, cannot toggle SZ Layer");
+                        showNotification("Please turn on Hazards layer first", {title: 'Hazards Layer', type: 'error', showNow: true});
+                        return;
+                    }
+
                     szLayerItem.click();
 
                     await waitAndUpdate(() => { // Wait for the UI to update after the click
