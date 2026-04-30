@@ -115,6 +115,13 @@ function init() {
                 const phLayerItem = document.querySelector(WME_PHL_GROUP_SELECTOR_ID);
                 const szLayerItem = document.querySelector(WME_SZL_SELECTOR_ID);
                 if (phLayerItem && szLayerItem) {
+                    /**
+                     * Possible Alternate Way (though it's incorrect and would need updating)
+                     * const layers = W.map.getLayers().filter(
+                     *     (layer) => layer.name.includes('permanent_hazard') && layer.visiblity
+                     * );
+                     * const visible = layers.length > 0;
+                     */
                     const isPHGroupVisible = phLayerItem.shadowRoot.querySelector('input[type="checkbox"]').checked;
                     // If PH Group is not visible, exit early
                     if (!isPHGroupVisible) {
