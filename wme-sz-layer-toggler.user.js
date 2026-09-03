@@ -2,7 +2,7 @@
 // @name         WME SZ Layer Toggler
 // @namespace    https://greasyfork.org/en/users/1558508-darkest-ways-waze
 // @description  Toggle the School Zone layer on/off in WME
-// @version      2026.04.16.01
+// @version      2026.09.04.01
 // @author       DarkestWays
 // @match        *://*.waze.com/*editor*
 // @exclude      *://*.waze.com/user/editor*
@@ -154,7 +154,7 @@ function init() {
     wmeSdk.Events.once({eventName: "wme-ready"}).then(() => {
         logger("WME is now ready");
         setupShortcuts();
-        showNotification(`v${SCRIPT_VERSION} loaded`, {title: '', type: 'success', showNow: true});
+        // showNotification(`v${SCRIPT_VERSION} loaded`, {title: '', type: 'success', showNow: true});
     });
 
     logger(`${SCRIPT_NAME} v${SCRIPT_VERSION} initialised.`);
